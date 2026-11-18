@@ -1,0 +1,18 @@
+GOLDEN SOPR — NOTICE
+====================
+
+GOLDEN SOPR is based on BackPack by Amin Mohammadi (AminMGMT):
+  Based on BackPack by Amin Mohammadi (AminMGMT)
+  https://github.com/AminMGMT/BackPack
+
+BackPack is released under the GNU Affero General Public License v3.0
+(AGPL-3.0). GOLDEN SOPR is likewise released under AGPL-3.0; see LICENSE
+for where to read the full text.
+
+Attribution: modified versions must keep the line above, unaltered, in
+their README (and in this NOTICE file).
+
+Name & logo: "BackPack", its name and logo are not licensed as part of
+the source code. This project uses its own name and branding (GOLDEN SOPR)
+and does not use BackPack's name or logo. It is permitted to truthfully
+state that the project is based on or compatible with BackPack.
