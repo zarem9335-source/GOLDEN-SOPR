@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # GOLDEN SOPR installer — installs golden-sopr + `sopr` symlink.
-# Module path stays github.com/zarem9335-source/GOLDEN-SOPR; display name GOLDEN SOPR.
+# Module path stays github.com/soprpack/soprpack; display name GOLDEN SOPR.
 #   bash <(curl -fsSL https://raw.githubusercontent.com/zarem9335-source/GOLDEN-SOPR/main/install.sh)
 #   BP_BUILD_FROM_SOURCE=1 bash install.sh   # build from source (needs Go)
 set -euo pipefail
