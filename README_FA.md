@@ -48,7 +48,7 @@ sudo golden-sopr   # ۲. Setup Kharej → لینک golden:// را پیست کن
 ## شروع سریع
 
 ```bash
-bash <(curl -fsSL https://raw.githubusercontent.com/soprpack/soprpack/main/install.sh)
+bash <(curl -fsSL https://raw.githubusercontent.com/zarem9335-source/GOLDEN-SOPR/main/install.sh)
 sudo golden-sopr
 ```
 

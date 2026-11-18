@@ -1,11 +1,11 @@
 #!/usr/bin/env bash
 # GOLDEN SOPR installer — installs golden-sopr + `sopr` symlink.
-# Module path stays github.com/soprpack/soprpack; display name GOLDEN SOPR.
-#   bash <(curl -fsSL https://raw.githubusercontent.com/soprpack/soprpack/main/install.sh)
+# Module path stays github.com/zarem9335-source/GOLDEN-SOPR; display name GOLDEN SOPR.
+#   bash <(curl -fsSL https://raw.githubusercontent.com/zarem9335-source/GOLDEN-SOPR/main/install.sh)
 #   BP_BUILD_FROM_SOURCE=1 bash install.sh   # build from source (needs Go)
 set -euo pipefail
 
-REPO="soprpack/soprpack"
+REPO="zarem9335-source/GOLDEN-SOPR"
 BIN="golden-sopr"
 INSTALL_DIR="/usr/local/bin"
 CONFIG_DIR="/etc/golden-sopr"      # new home; legacy /etc/soprpack is symlinked as fallback

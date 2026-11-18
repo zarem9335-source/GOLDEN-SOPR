@@ -86,7 +86,7 @@ tuning (keepalive ≤ 10s, MTU 1200–1420).
 ## Quick start
 
 ```bash
-bash <(curl -fsSL https://raw.githubusercontent.com/soprpack/soprpack/main/install.sh)
+bash <(curl -fsSL https://raw.githubusercontent.com/zarem9335-source/GOLDEN-SOPR/main/install.sh)
 sudo golden-sopr   # or: sudo sopr (symlink)
 ```
 
