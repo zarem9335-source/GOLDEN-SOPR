@@ -57,7 +57,16 @@ if [ "${BP_BUILD_FROM_SOURCE:-0}" = "1" ]; then
     git clone --depth 1 "https://github.com/$REPO.git" "$TMP/src" || { echo "git clone failed" >&2; exit 1; }
     SRC="$TMP/src"
   fi
-  (cd "$SRC" && go build -trimpath -o "$TMP/$BIN" .)
+  # proxy.golang.org returns 403 from many Iran servers, so retry the
+  # build with other module proxies instead of failing outright.
+  build_src() { (cd "$SRC" && go build -trimpath -o "$TMP/$BIN" .); }
+  if ! build_src; then
+    echo "Go module download failed, retrying with GOPROXY=direct ..."
+    if ! (export GOPROXY=direct GOSUMDB=off; build_src); then
+      echo "Retrying with GOPROXY=https://goproxy.cn,direct ..."
+      (export GOPROXY=https://goproxy.cn,direct GOSUMDB=off; build_src) || { echo "Source build failed — use the release binary install instead (no Go needed)." >&2; exit 1; }
+    fi
+  fi
   install_binary "$TMP/$BIN"
 else
   # Latest release asset: golden-sopr-linux-<arch> (+ .sha256 if published).
@@ -68,14 +77,17 @@ else
   ASSET="$BIN-linux-$GOARCH"
   URL="https://github.com/$REPO/releases/download/$TAG/$ASSET"
   echo "Downloading $URL ..."
-  curl -fsSL "$URL" -o "$TMP/$BIN" || { echo "Download failed — the release may not have $ASSET yet; use BP_BUILD_FROM_SOURCE=1" >&2; exit 1; }
+  # Download under the asset name (golden-sopr-linux-amd64), NOT $BIN:
+  # the published .sha256 file lists that exact name, so sha256sum -c
+  # below must find a file with that name in $TMP.
+  curl -fsSL "$URL" -o "$TMP/$ASSET" || { echo "Download failed — the release may not have $ASSET yet; use BP_BUILD_FROM_SOURCE=1" >&2; exit 1; }
   if curl -fsSL "https://github.com/$REPO/releases/download/$TAG/$ASSET.sha256" -o "$TMP/$ASSET.sha256" 2>/dev/null; then
     (cd "$TMP" && sha256sum -c "$ASSET.sha256") || { echo "Checksum verification FAILED" >&2; exit 1; }
     echo "Checksum OK."
   else
     echo "No published checksum for this asset — skipping verification."
   fi
-  install_binary "$TMP/$BIN"
+  install_binary "$TMP/$ASSET"
 fi
 
 # systemd unit (single service; per-tunnel runs are `golden-sopr run --tunnel NAME`).
