@@ -361,9 +361,19 @@ func OptimizeMenu() error {
 		fmt.Println("Gaming tip: use the gaming preset / wg-gaming transport (MTU 1280, keepalive 5s).")
 		return nil
 	}
+	failed := 0
 	for _, c := range cmds {
 		out, err := exec.Command(c[0], c[1:]...).CombinedOutput()
-		fmt.Printf("$ %s → %s %v\n", strings.Join(c, " "), strings.TrimSpace(string(out)), err)
+		if err != nil {
+			failed++
+			fmt.Printf("$ %s → %s FAILED: %v\n", strings.Join(c, " "), strings.TrimSpace(string(out)), err)
+		} else {
+			fmt.Printf("$ %s → %s OK\n", strings.Join(c, " "), strings.TrimSpace(string(out)))
+		}
+	}
+	if failed > 0 {
+		fmt.Printf("Optimize: %d of %d sysctls failed (see FAILED above) — the rest were applied.\n", failed, len(cmds))
+		return nil
 	}
 	fmt.Println("Optimize done: BBR + fq + TCP fastopen applied (gaming-friendly).")
 	return nil
@@ -407,7 +417,7 @@ func WebPanelMenu(cfgPath string) error {
 		Metrics:     func() map[string]any { return map[string]any{"uptime": time.Now().Format(time.RFC3339)} },
 	}
 	srv := web.New(addr, cfg.WebPanel.Username, cfg.WebPanel.Password, prov)
-	fmt.Printf("\033[38;5;220mGOLDEN SOPR web panel at http://%s\033[0m  (user: %s — change the password in the config!)\nPress Ctrl+C to stop.\n", addr, srv.Username)
+	fmt.Printf("\033[38;5;220mStarting GOLDEN SOPR web panel (first free port from %s)\033[0m  (user: %s — change the password in the config!)\nPress Ctrl+C to stop.\n", addr, srv.Username)
 	return srv.ListenAndServe(context.Background())
 }
 

@@ -10,7 +10,9 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"net"
 	"net/http"
+	"strconv"
 	"strings"
 	"sync"
 	"time"
@@ -84,15 +86,44 @@ func (s *Server) Handler() http.Handler {
 	return mux
 }
 
-// ListenAndServe runs the panel until ctx ends.
+// ListenAndServe runs the panel until ctx ends. If the configured port
+// is already in use (e.g. another panel took 2097), it tries the next
+// free port in 2097-2105 instead of failing, and updates s.Addr so the
+// caller prints the port that actually works.
 func (s *Server) ListenAndServe(ctx context.Context) error {
-	srv := &http.Server{Addr: s.Addr, Handler: s.Handler(),
+	srv := &http.Server{Handler: s.Handler(),
 		ReadHeaderTimeout: 10 * time.Second}
 	go func() {
 		<-ctx.Done()
 		_ = srv.Shutdown(context.Background())
 	}()
-	err := srv.ListenAndServe()
+	host, portStr, err := net.SplitHostPort(s.Addr)
+	if err != nil {
+		return srv.ListenAndServe()
+	}
+	port, err := strconv.Atoi(portStr)
+	if err != nil {
+		return srv.ListenAndServe()
+	}
+	var ln net.Listener
+	for p := port; p <= port+8; p++ {
+		ln, err = net.Listen("tcp", net.JoinHostPort(host, strconv.Itoa(p)))
+		if err == nil {
+			if p != port {
+				fmt.Printf("GOLDEN SOPR: port %d is already in use, web panel moved to %d\n", port, p)
+			}
+			s.Addr = net.JoinHostPort(host, strconv.Itoa(p))
+			break
+		}
+		if !strings.Contains(err.Error(), "address already in use") {
+			return err
+		}
+	}
+	if ln == nil {
+		return err
+	}
+	fmt.Printf("GOLDEN SOPR web panel at http://%s (user: %s)\n", s.Addr, s.Username)
+	err = srv.Serve(ln)
 	if err == http.ErrServerClosed {
 		return nil
 	}
